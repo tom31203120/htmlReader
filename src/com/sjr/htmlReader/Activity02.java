@@ -1,4 +1,4 @@
-package com.yarin.android.Examples_08_01;
+package com.sjr.htmlReader;
 
 import java.io.BufferedReader;
 import java.io.IOException;
