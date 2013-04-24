@@ -119,6 +119,13 @@ public class Activity01 extends Activity
 		btn_GetStartOnApp.setOnClickListener(new Button.OnClickListener() {
 			public void onClick(View v)
 			{
+				Intent intent = new Intent();
+				intent.setAction(Intent.ACTION_SEND);
+				intent.setType("text/plain");
+				intent.putExtra(Intent.EXTRA_SUBJECT, "分享主题");
+				intent.putExtra(Intent.EXTRA_TEXT,  "我在使用冲浪日历，很全面，里面结合了很多的日常应用非常好，" +
+						"下载地址：www.clkeji.com"); 
+				startActivity(Intent.createChooser(intent, "分享的软件")); 
 				/*
 				Intent intent = new Intent();        
 				intent.setAction("android.intent.action.VIEW");    
@@ -129,6 +136,18 @@ public class Activity01 extends Activity
 				Uri uri = Uri.parse("geo:52.76, -79.0342");
 				Intent intent = new Intent(Intent.ACTION_VIEW, uri);
 				startActivity(intent);*/
+			}
+		});
+		Button btn_RtnHome = (Button) findViewById(R.id.Button_ReturnHome);
+		// 监听button的事件信息 
+		btn_RtnHome.setOnClickListener(new Button.OnClickListener() {
+			public void onClick(View v)
+			{
+				Intent intent = new Intent();
+				//为Intent设置Action、Category属性
+				intent.setAction(Intent.ACTION_MAIN);
+				intent.addCategory(Intent.CATEGORY_HOME);
+				startActivity(intent);
 			}
 		});
 	}

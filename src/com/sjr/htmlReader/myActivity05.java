@@ -65,6 +65,12 @@ public class myActivity05 extends Activity
 			public void onClick(View v)
 			{
 				//取得编辑框中我们输入的内容
+				Intent intent = new Intent();        
+				intent.setAction("android.intent.action.VIEW");    
+				Uri content_url = Uri.parse("http://www.cnblogs.com");   
+				intent.setData(content_url);           
+				intent.setClassName("com.UCMobile","com.UCMobile.main.UCMobile");
+				startActivity(intent);
 		    	String url = mEditText.getText().toString();
 		    	handleURL(url);
 			}

@@ -42,5 +42,10 @@
 		android:id="@+id/Button_StartOn" 
 		android:layout_width="fill_parent" 
 		android:layout_height="wrap_content" 
-		android:text="产看开机运行的程序"/>
+		android:text="分享功能"/>
+	<Button 
+		android:id="@+id/Button_ReturnHome" 
+		android:layout_width="fill_parent" 
+		android:layout_height="wrap_content" 
+		android:text="回主界面"/>
 </LinearLayout>

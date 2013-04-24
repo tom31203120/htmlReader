@@ -48,6 +48,25 @@
 					>
 				</data>
 			</intent-filter>
+			<intent-filter
+				>
+				<action
+					android:name="android.intent.action.SEND_MULTIPLE"
+					>
+				</action>
+				<action
+					android:name="android.intent.action.SEND"
+					>
+				</action>
+				<category
+					android:name="android.intent.category.DEFAULT"
+					>
+				</category>
+				<data
+					android:mimeType="*/*"
+					>
+				</data>
+			</intent-filter>
         </activity> 
 		<activity android:name="Activity02"></activity>
 		<activity android:name="Activity03"></activity>
