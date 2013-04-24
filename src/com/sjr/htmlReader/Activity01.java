@@ -115,7 +115,7 @@ public class Activity01 extends Activity
 			}
 		});
 		Button btn_GetStartOnApp = (Button) findViewById(R.id.Button_StartOn);
-		// 监听button的事件信息 
+		// 分享按钮 
 		btn_GetStartOnApp.setOnClickListener(new Button.OnClickListener() {
 			public void onClick(View v)
 			{

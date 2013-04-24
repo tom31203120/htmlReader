@@ -3,11 +3,9 @@ package com.sjr.htmlReader;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -24,6 +22,9 @@ import android.webkit.URLUtil;
 import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
+import android.content.ClipData;
+
 
 //直接获取数据
 public class myActivity05 extends Activity
@@ -32,6 +33,7 @@ public class myActivity05 extends Activity
 	private Button		mButton;
 	private EditText	mEditText;
 	private WebView		mWebView;
+	private TextView    mTextView;
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -40,25 +42,38 @@ public class myActivity05 extends Activity
 		setContentView(R.layout.save_http);				
 		mButton   = (Button)   findViewById(R.id.Button01);
 		mWebView  = (WebView)  findViewById(R.id.WebView01);
+		mTextView = (TextView) findViewById(R.id.TextView01);
 		mEditText = (EditText) findViewById(R.id.EditText01);
 
 	    // Get the intent that started this activity
 	    Intent intent = getIntent();
-	    Uri data = intent.getData();
-
+	    ClipData cp = intent.getClipData();
+	    String strCp = cp.getItemAt(0).getText().toString();
+	    if (null != strCp)
+	    {
+	    	mEditText.setText(strCp);
+	    	mTextView.setText(strCp);
+	    	//mWebView.set
+	    	//mTextView.set
+	    }
+		//显示Action属性
 	    /*// Figure out what to do based on the intent type
 	    if (intent.getType().indexOf("image/") != -1) {
 	        // Handle intents with image data ...
 	    } else if (intent.getType().equals("text/plain")) {
 	        // Handle intents with text ...
 	    }*/
-		//显示Action属性
-	    String uriStr = data.toString();
-		mEditText.setText(uriStr);
-		if (null != uriStr)
-		{
-			handleURL(uriStr);
-		}
+	    Uri data = intent.getData();
+	    if (null != data)
+	    {
+	    	String uriStr = data.toString();
+	    	mEditText.setText(uriStr);		
+	    	if (null != uriStr)
+			{
+				handleURL(uriStr);
+			}
+	    }
+
 		//连接按钮事件监听
 		mButton.setOnClickListener(new OnClickListener()
 		{
