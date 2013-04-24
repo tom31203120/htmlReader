@@ -150,6 +150,17 @@ public class Activity01 extends Activity
 				startActivity(intent);
 			}
 		});
+		Button btn_CtxMenu = (Button) findViewById(R.id.Button_CtxMenu);
+		// 监听button的事件信息 
+		btn_CtxMenu.setOnClickListener(new Button.OnClickListener() {
+			public void onClick(View v)
+			{
+				Intent intent = new Intent();
+				//为Intent设置Action、Category属性
+				intent.setClass(Activity01.this, ContextMenuAct.class);
+				startActivity(intent);
+			}
+		});
 	}
 
 	static final String BOOT_START_PERMISSION = "android.permission.RECEIVE_BOOT_COMPLETED";
