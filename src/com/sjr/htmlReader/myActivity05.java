@@ -14,6 +14,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -47,12 +48,16 @@ public class myActivity05 extends Activity
 
 	    // Get the intent that started this activity
 	    Intent intent = getIntent();
+	    String filename = intent.getStringExtra(Intent.EXTRA_SUBJECT);
 	    ClipData cp = intent.getClipData();
+	    
 	    String strCp = cp.getItemAt(0).getText().toString();
 	    if (null != strCp)
 	    {
-	    	mEditText.setText(strCp);
+	    	mEditText.setText(filename);
 	    	mTextView.setText(strCp);
+	    	SaveTxtSdcard.put(strCp, filename);
+	    	startMoonReaderp(filename);
 	    	//mWebView.set
 	    	//mTextView.set
 	    }
@@ -79,7 +84,16 @@ public class myActivity05 extends Activity
 		{
 			public void onClick(View v)
 			{
-				//取得编辑框中我们输入的内容
+				Intent intent = new Intent();
+				intent.setAction(android.content.Intent.ACTION_VIEW);
+				String filename = Environment.getExternalStorageDirectory().getPath() + 
+						"/htmlReader/" + mEditText.getText().toString() + ".txt";
+				Log.d("dddd", filename);
+				File file = new File(filename);
+				intent.setDataAndType(Uri.fromFile(file), "text/*");
+				startActivity(intent);
+				
+				/*//取得编辑框中我们输入的内容
 				Intent intent = new Intent();        
 				intent.setAction("android.intent.action.VIEW");    
 				Uri content_url = Uri.parse("http://www.cnblogs.com");   
@@ -87,7 +101,7 @@ public class myActivity05 extends Activity
 				intent.setClassName("com.UCMobile","com.UCMobile.main.UCMobile");
 				startActivity(intent);
 		    	String url = mEditText.getText().toString();
-		    	handleURL(url);
+		    	handleURL(url);*/
 			}
 		});
 	}
@@ -102,6 +116,19 @@ public class myActivity05 extends Activity
 				return true;
 			}
 			return super.onKeyDown(keyCode, event);
+	}
+	/*启动静读天下来朗读文本*/
+	void startMoonReaderp(String filename)
+	{
+		Intent intent = new Intent();
+		intent.setAction(android.content.Intent.ACTION_VIEW);
+		String pathname = Environment.getExternalStorageDirectory().getPath() + 
+				"/htmlReader/" + filename + ".txt";
+		Log.d("dddd", pathname);
+		File file = new File(pathname);
+		intent.setClassName("com.flyersoft.moonreaderp","com.flyersoft.moonreaderp.ActivityMain");
+		intent.setDataAndType(Uri.fromFile(file), "text/*");
+		startActivity(intent);
 	}
 	/*保存网页的处理*/
 	void saveWebPage(String httpUrl){

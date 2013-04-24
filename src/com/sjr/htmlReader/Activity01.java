@@ -110,7 +110,8 @@ public class Activity01 extends Activity
 				intent.setAction("android.intent.action.VIEW");    
 				Uri content_url = Uri.parse("http://www.cnblogs.com");   
 				intent.setData(content_url);           
-				intent.setClassName("com.UCMobile","com.UCMobile.main.UCMobile");
+				//intent.setClassName("com.UCMobile","com.UCMobile.main.UCMobile");
+				intent.setClassName("com.flyersoft.moonreaderp","com.flyersoft.moonreaderp.ActivityMain");
 				startActivity(intent);
 			}
 		});
@@ -123,7 +124,7 @@ public class Activity01 extends Activity
 				intent.setAction(Intent.ACTION_SEND);
 				intent.setType("text/plain");
 				intent.putExtra(Intent.EXTRA_SUBJECT, "分享主题");
-				intent.putExtra(Intent.EXTRA_TEXT,  "我在使用冲浪日历，很全面，里面结合了很多的日常应用非常好，" +
+				intent.putExtra(Intent.EXTRA_TEXT, "我在使用冲浪日历，很全面，里面结合了很多的日常应用非常好，" +
 						"下载地址：www.clkeji.com"); 
 				startActivity(Intent.createChooser(intent, "分享的软件")); 
 				/*
