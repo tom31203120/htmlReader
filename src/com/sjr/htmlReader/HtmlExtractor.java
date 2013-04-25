@@ -22,7 +22,7 @@ public class HtmlExtractor {
 
 		//give the url to be parsed
 		strbean.setURL(url);
-
+		
 		return strbean.getStrings();
 	}
 

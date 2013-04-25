@@ -21,7 +21,8 @@ public class Activity02 extends Activity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.http);		
 		TextView mTextView = (TextView)this.findViewById(R.id.TextView_HTTP);
-		String strUrl = "http://mp.weixin.qq.com/mp/appmsg/show?__biz=MjM5MjAyNDUyMA==&appmsgid=10000210&itemidx=1#wechat_redirect";
+		//String strUrl = "http://mp.weixin.qq.com/mp/appmsg/show?__biz=MjM5MjAyNDUyMA==&appmsgid=10000210&itemidx=1#wechat_redirect";
+		String strUrl = "http://htmlparser.sourceforge.net/javadoc/org/htmlparser/beans/StringBean.html";
 		String res = null;
 		Html2txt ht = new Html2txt();
 		ht.execute(strUrl);

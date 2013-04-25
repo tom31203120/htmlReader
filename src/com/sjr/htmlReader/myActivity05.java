@@ -1,26 +1,18 @@
 package com.sjr.htmlReader;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.util.concurrent.ExecutionException;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.webkit.URLUtil;
-import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -31,9 +23,9 @@ import android.content.ClipData;
 public class myActivity05 extends Activity
 {
 	private final String DEBUG_TAG = "Activity05";
+	private final String PATH_NAME = Environment.getExternalStorageDirectory().getPath() + "/htmlReader/"; 
 	private Button		mButton;
 	private EditText	mEditText;
-	private WebView		mWebView;
 	private TextView    mTextView;
 	/** Called when the activity is first created. */
 	@Override
@@ -42,41 +34,42 @@ public class myActivity05 extends Activity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.save_http);				
 		mButton   = (Button)   findViewById(R.id.Button01);
-		mWebView  = (WebView)  findViewById(R.id.WebView01);
 		mTextView = (TextView) findViewById(R.id.TextView01);
 		mEditText = (EditText) findViewById(R.id.EditText01);
 
 	    // Get the intent that started this activity
 	    Intent intent = getIntent();
-	    String filename = intent.getStringExtra(Intent.EXTRA_SUBJECT);
-	    ClipData cp = intent.getClipData();
-	    
-	    String strCp = cp.getItemAt(0).getText().toString();
-	    if (null != strCp)
+	    String strAction = intent.getAction();
+	    if ("android.intent.action.VIEW".equals(strAction))
 	    {
-	    	mEditText.setText(filename);
-	    	mTextView.setText(strCp);
-	    	SaveTxtSdcard.put(strCp, filename);
-	    	startMoonReaderp(filename);
-	    	//mWebView.set
-	    	//mTextView.set
+	    	Uri data = intent.getData();
+	 	    if (null != data)
+	 	    {
+	 	    	String uriStr = data.toString();
+	 	    	mEditText.setText(uriStr);		
+	 	    	if (null != uriStr)
+	 			{
+	 				handleURL(uriStr);
+	 			}
+	 	    }
 	    }
-		//显示Action属性
-	    /*// Figure out what to do based on the intent type
-	    if (intent.getType().indexOf("image/") != -1) {
-	        // Handle intents with image data ...
-	    } else if (intent.getType().equals("text/plain")) {
-	        // Handle intents with text ...
-	    }*/
-	    Uri data = intent.getData();
-	    if (null != data)
+	    else if ("android.intent.action.SEND".equals(strAction))
 	    {
-	    	String uriStr = data.toString();
-	    	mEditText.setText(uriStr);		
-	    	if (null != uriStr)
-			{
-				handleURL(uriStr);
-			}
+	    	/*处理ActionSend的情况*/
+		    ClipData cp = intent.getClipData();
+		    if (null != cp)
+		    {
+		    	String title = sanitizeFilename(intent.getStringExtra(Intent.EXTRA_SUBJECT));
+			    String strCp = cp.getItemAt(0).getText().toString();
+			    if (null != strCp)
+			    {
+			    	mEditText.setText(title);
+			    	mTextView.setText(strCp);
+			    	SaveTxtSdcard.put(strCp, title);
+			    	//启动静读天下
+			    	startMoonReaderp(title);
+			    }
+		    }
 	    }
 
 		//连接按钮事件监听
@@ -86,8 +79,8 @@ public class myActivity05 extends Activity
 			{
 				Intent intent = new Intent();
 				intent.setAction(android.content.Intent.ACTION_VIEW);
-				String filename = Environment.getExternalStorageDirectory().getPath() + 
-						"/htmlReader/" + mEditText.getText().toString() + ".txt";
+				String title = sanitizeFilename(mEditText.getText().toString());
+				String filename = PATH_NAME + title + ".txt";
 				Log.d("dddd", filename);
 				File file = new File(filename);
 				intent.setDataAndType(Uri.fromFile(file), "text/*");
@@ -105,109 +98,63 @@ public class myActivity05 extends Activity
 			}
 		});
 	}
-
-	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if ((keyCode == KeyEvent.KEYCODE_BACK) && 
-				 mWebView.canGoBack())
-			{
-				//返回前一个页面
-				mWebView.goBack();
-				return true;
-			}
-			return super.onKeyDown(keyCode, event);
+	
+	/*异步下载网页*/
+	private class Html2txt extends AsyncTask<String, Void, String>
+	{
+		@Override
+		protected String doInBackground(String... params) {
+			// TODO Auto-generated method stub
+			return new HtmlExtractor().getContent(params[0]);
+		}
 	}
+	
 	/*启动静读天下来朗读文本*/
-	void startMoonReaderp(String filename)
+	void startMoonReaderp(String title)
 	{
 		Intent intent = new Intent();
 		intent.setAction(android.content.Intent.ACTION_VIEW);
-		String pathname = Environment.getExternalStorageDirectory().getPath() + 
-				"/htmlReader/" + filename + ".txt";
+		String pathname = PATH_NAME + title + ".txt";
 		Log.d("dddd", pathname);
 		File file = new File(pathname);
 		intent.setClassName("com.flyersoft.moonreaderp","com.flyersoft.moonreaderp.ActivityMain");
 		intent.setDataAndType(Uri.fromFile(file), "text/*");
 		startActivity(intent);
 	}
-	/*保存网页的处理*/
-	void saveWebPage(String httpUrl){
-		//获得的数据
-		String resultData = "";
-		String FileName   = "te1st";
-		URL url = null;
-		try
-		{
-			//构造一个URL对象
-			url = new URL(httpUrl); 
-		}
-		catch (MalformedURLException e)
-		{
-			Log.e(DEBUG_TAG, "MalformedURLException");
-		}
-		if (url != null)
-		{
-			try
-			{
-				//使用HttpURLConnection打开连接
-				HttpURLConnection urlConn = (HttpURLConnection) url.openConnection();
-				//得到读取的内容(流)
-				InputStreamReader in = new InputStreamReader(urlConn.getInputStream());
-				// 为输出创建BufferedReader
-				BufferedReader buffer = new BufferedReader(in);
-				String inputLine = null;
-				//使用循环来读取获得的数据
-				while (((inputLine = buffer.readLine()) != null))
-				{
-					//我们在每一行后面加上一个"\n"来换行
-					resultData += inputLine + "\n";
-				}		  
-				//关闭InputStreamReader
-				in.close();
-				//关闭http连接
-				urlConn.disconnect();
-				//保存串为文件
-				//mTextView.setText(resultData);
-				SaveTxtSdcard.put(resultData, FileName);
-				//parseWebPage(resultData);
-			}
-			catch (IOException e)
-			{
-				Log.e(DEBUG_TAG, "IOException");
-			}
-		}
-		else
-		{
-			Log.e(DEBUG_TAG, "Url NULL");
-		}
-	}
-	/*转化网页的处理*/
-	void parseWebPage(String str){
-        try {    
-        	File file=new File("/sdcard/1/tttt.txt");
-			FileWriter fw = new FileWriter(file);
-            BufferedWriter bfw = new BufferedWriter(fw);
-            bfw.write(str, 0, str.length());
-            bfw.flush();
-        } catch (IOException e1) {
-            e1.printStackTrace();
-        }
-	}
+	
 	void handleURL(String url)
 	{
 		try 
 		{
-	    	//保存网页
-	    	saveWebPage(url);
 	    	//判断输入的内容是不是网址
 	    	if ( URLUtil.isNetworkUrl(url) )
 			{  
 	    		//装载网址
-	    		mWebView.loadUrl(url);
+	    		String res = null;
+	    		Html2txt ht = new Html2txt();
+	    		ht.execute(url);
+	    		try {
+	    			res = ht.get();
+	    		} catch (InterruptedException e) {
+	    			// TODO Auto-generated catch block
+	    			e.printStackTrace();
+	    		} catch (ExecutionException e) {
+	    			// TODO Auto-generated catch block
+	    			e.printStackTrace();
+	    		}
+	    		Log.i("Act2", res);
+	    		String title = getFileNameFromRes(res);
+	    		
+	    		mEditText.setText(title);
+	    		mTextView.setText(res);
+	    		//保存文件
+		    	SaveTxtSdcard.put(res, title);
+		    	//启动静读天下
+		    	startMoonReaderp(title);
 			}
 	    	else
 	    	{
-	    		mEditText.setText("输入网址错误，请重新输入");
+	    		mEditText.setText("网址错误,或者网址不可达");
 			}
 		}
 		catch (Exception e) 
@@ -215,6 +162,23 @@ public class myActivity05 extends Activity
 			Log.e(DEBUG_TAG, e.toString());
 		}
 	}
+	
+	private String getFileNameFromRes(String res) {
+		// TODO Auto-generated method stub
+		String title = null;
+		int index = 0, offset = 0;   
+        if ((index = res.indexOf("\n", index + 1)) != -1) {  
+        	title = sanitizeFilename(res.substring(offset, index));  
+        }  
+		return title;
+	}
+	
+	private String sanitizeFilename(String unsanitized) {
+		return unsanitized
+				.replaceAll("[\\?\\\\/:|<>\\*]", " ") // filter out ? \ / : | < > *
+				.replaceAll("\\s", "_");              // white space as underscores
+	}
+	
 }
 
 
