@@ -1,13 +1,10 @@
 package com.sjr.htmlReader;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.util.concurrent.ExecutionException;
+
 import android.app.Activity;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -17,7 +14,6 @@ import android.widget.TextView;
 //直接获取数据
 public class Activity02 extends Activity
 {
-	private final String DEBUG_TAG = "Activity02"; 
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -25,53 +21,21 @@ public class Activity02 extends Activity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.http);		
 		TextView mTextView = (TextView)this.findViewById(R.id.TextView_HTTP);
-		//http地址"?par=abcdefg"是我们上传的参数
-		String httpUrl = "http://192.168.1.103/E%3A/code/android_application_sample_code/8/Examples_08_01/httpget.jsp";
-		//获得的数据
-		String resultData = "";
-		URL url = null;
-		try
-		{
-			//构造一个URL对象
-			url = new URL(httpUrl); 
+		String strUrl = "http://mp.weixin.qq.com/mp/appmsg/show?__biz=MjM5MjAyNDUyMA==&appmsgid=10000210&itemidx=1#wechat_redirect";
+		String res = null;
+		Html2txt ht = new Html2txt();
+		ht.execute(strUrl);
+		try {
+			res = ht.get();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		catch (MalformedURLException e)
-		{
-			Log.e(DEBUG_TAG, "MalformedURLException");
-		}
-		if (url != null)
-		{
-			try
-			{
-				//使用HttpURLConnection打开连接
-				HttpURLConnection urlConn = (HttpURLConnection) url.openConnection();
-				//得到读取的内容(流)
-				InputStreamReader in = new InputStreamReader(urlConn.getInputStream());
-				// 为输出创建BufferedReader
-				BufferedReader buffer = new BufferedReader(in);
-				String inputLine = null;
-				//使用循环来读取获得的数据
-				while (((inputLine = buffer.readLine()) != null))
-				{
-					//我们在每一行后面加上一个"\n"来换行
-					resultData += inputLine + "\n";
-				}		  
-				//关闭InputStreamReader
-				in.close();
-				//关闭http连接
-				urlConn.disconnect();
-				//设置显示取得的内容
-				mTextView.setText(resultData);
-			}
-			catch (IOException e)
-			{
-				Log.e(DEBUG_TAG, "IOException");
-			}
-		}
-		else
-		{
-			Log.e(DEBUG_TAG, "Url NULL");
-		}
+		Log.i("Act2", res);
+		mTextView.setText(res);
 		//设置按键事件监听
 		Button button_Back = (Button) findViewById(R.id.Button_Back);
 		/* 监听button的事件信息 */
@@ -89,6 +53,14 @@ public class Activity02 extends Activity
 				Activity02.this.finish();
 			}
 		});
+	}
+	private class Html2txt extends AsyncTask<String, Void, String>
+	{
+		@Override
+		protected String doInBackground(String... params) {
+			// TODO Auto-generated method stub
+			return new HtmlExtractor().getContent(params[0]);
+		}
 	}
 }
 
