@@ -68,7 +68,7 @@ public class Activity01 extends Activity
 				// 新建一个Intent对象 
 				Intent intent = new Intent();
 				// 指定intent要启动的类 
-				intent.setClass(Activity01.this, Activity04.class);
+				intent.setClass(Activity01.this, ttsAct.class);
 				// 启动一个新的Activity 
 				startActivity(intent);
 				// 关闭当前的Activity 
